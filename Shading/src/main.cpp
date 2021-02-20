@@ -19,67 +19,6 @@
 
 #include "utils\vendor\stb_image.h"
 
-typedef unsigned int uint32;
-
-static float EPSILON = FLT_EPSILON * 15000;
-
-uint32 createComputeShader(const char *filename)
-{
-	GLuint rayShader = glCreateShader(GL_COMPUTE_SHADER);
-	char *rayShaderSource = ReadStringFromFile(filename);
-	glShaderSource(rayShader, 1, &rayShaderSource, NULL);
-	glCompileShader(rayShader);
-	
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(rayShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(rayShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::COMPUTE::COMPILATION_FAILED\n" << infoLog << std::endl;
-		return -1;
-	}
-
-	GLuint rayProgram = glCreateProgram();
-	glAttachShader(rayProgram, rayShader);
-	glLinkProgram(rayProgram);
-
-	glGetProgramiv(rayProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(rayProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-
-	glDeleteShader(rayShader);
-
-	return rayProgram;
-}
-
-uint32 createTestVAO()
-{
-	float vertices[] = {
-		-1.f, -1.f, 0.0f,
-		-1.f,  1.f, 0.0f,
-		1.f,  1.f, 0.0f,
-		1.f,  1.f, 0.0f,
-		1.f, -1.f, 0.0f,
-		-1.f, -1.f, 0.0f,
-	};
-
-	uint32 VBO, VAO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	return(VAO);
-}
-
 int main()
 {
 	if (!glfwInit())
@@ -178,6 +117,11 @@ int main()
 
 	glUniform1i(glGetUniformLocation(shader.id, "tex1"), 0);
 	glUniform1i(glGetUniformLocation(shader.id, "tex2"), 1);
+
+	mat4 rotation = mat4RotationZ(M_PI / 2);
+	mat4 scaling = mat4Scaling({ 0.5f, 0.5f, 0.5f, 1.0f });
+	mat4 transform = mat4Mul(&scaling, &rotation);
+	coreShaderSetUniformMatrix4f(&shader, "transform", &transform);
 
 	while (!glfwWindowShouldClose(window))
 	{

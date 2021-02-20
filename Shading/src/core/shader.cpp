@@ -74,12 +74,16 @@ void coreShaderSetUniform3f(coreShader *shader, const char *uniformName, vec3f v
 {
 	coreShaderBind(shader);
 	glUniform3f(glGetUniformLocation(shader->id, uniformName), value.x, value.y, value.z);
-	//glUniform1fv(glGetUniformLocation(shader->id, uniformName), 3, (float*)(&value));
 }
 
 void coreShaderSetUniform4f(coreShader *shader, const char *uniformName, vec4f value)
 {
 	coreShaderBind(shader);
 	glUniform4f(glGetUniformLocation(shader->id, uniformName), value.x, value.y, value.z, value.w);
-	//glUniform1fv(glGetUniformLocation(shader->id, uniformName), 4, (float*)(&value));
+}
+
+void coreShaderSetUniformMatrix4f(coreShader *shader, const char *uniformName, mat4 *m)
+{
+	coreShaderBind(shader);
+	glUniformMatrix4fv(glGetUniformLocation(shader->id, uniformName), 1, GL_TRUE, (float*)m);
 }
