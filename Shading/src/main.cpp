@@ -118,14 +118,21 @@ int main()
 	glUniform1i(glGetUniformLocation(shader.id, "tex1"), 0);
 	glUniform1i(glGetUniformLocation(shader.id, "tex2"), 1);
 
-	mat4 rotation = mat4RotationZ(M_PI / 2);
+	/*mat4 rotation = mat4RotationZ(M_PI / 2);
 	mat4 scaling = mat4Scaling({ 0.5f, 0.5f, 0.5f, 1.0f });
 	mat4 transform = mat4Mul(&scaling, &rotation);
-	coreShaderSetUniformMatrix4f(&shader, "transform", &transform);
+	coreShaderSetUniformMatrix4f(&shader, "transform", &transform);*/
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
+
+		{
+			mat4 translation = mat4Translation({ 0.5, -0.5, 0.0f, 0.0f });
+			mat4 rotation = mat4RotationZ(glfwGetTime());
+			mat4 transformation = mat4Mul(&translation, &rotation);
+			coreShaderSetUniformMatrix4f(&shader, "transform", &transformation);
+		}
 
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
