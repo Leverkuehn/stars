@@ -139,6 +139,7 @@
     <ClCompile Include="src\math\utils.cpp" />
     <ClCompile Include="src\utils\info.cpp" />
     <ClCompile Include="src\utils\io.cpp" />
+    <ClCompile Include="src\utils\vendor\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\background.glsl" />
@@ -165,6 +166,7 @@
     <ClInclude Include="src\utils\info.h" />
     <ClInclude Include="src\utils\io.h" />
     <ClInclude Include="src\utils\types.h" />
+    <ClInclude Include="src\utils\vendor\stb_image.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,6 +17,8 @@
 
 #include "core\shader.h"
 
+#include "utils\vendor\stb_image.h"
+
 typedef unsigned int uint32;
 
 static float EPSILON = FLT_EPSILON * 15000;
@@ -99,19 +101,57 @@ int main()
 
 	glewInit();
 
-	printf("Maximum of vertex attributes supported: %d", getMaxVertexAttributesNumber());
+	printf("Maximum of vertex attributes supported: %d\n", getMaxVertexAttributesNumber());
 
 	float vertices[] = {  
-		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-	    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-	    -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		// positions		  // colors			  // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+	    -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
 	};
 
 	GLuint indices[] = {
 		0, 1, 3,
 		1, 2, 3
 	};
+
+//------------------ Initializing texture----------------------
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	stbi_set_flip_vertically_on_load(true);
+
+	int width, height, nrChannels;
+	uint8 *data = stbi_load("src/textures/Marigold Blue Pattern By William Morris.jpg", &width, &height, &nrChannels, 0);
+	if (!data)
+		printf("Failed to load a texture\n");
+
+	uint32 texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
+
+	data = stbi_load("src/textures/awesomeface.png", &width, &height, &nrChannels, 0);
+	if (!data)
+		printf("Failed to load a texture\n");
+	uint32 texture2;
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
+
+//------------------ End --------------------------------------
 
 	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -126,13 +166,18 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(sizeof(float)*3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	coreShader shader = coreShaderCreateFromVertexAndFragmentSource("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
 	coreShaderBind(&shader);
+
+	glUniform1i(glGetUniformLocation(shader.id, "tex1"), 0);
+	glUniform1i(glGetUniformLocation(shader.id, "tex2"), 1);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -143,8 +188,10 @@ int main()
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			coreShaderBind(&shader);
 			
-			vec3f color = { 1.0f, 0.0f, 0.0f };
-			coreShaderSetUniform3f(&shader, "u_Color", color);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texture2);
 
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
