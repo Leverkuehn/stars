@@ -13,6 +13,8 @@
 
 #include "math\matrices.h"
 
+#include "utils\info.h"
+
 typedef unsigned int uint32;
 
 static float EPSILON = FLT_EPSILON * 15000;
@@ -160,11 +162,13 @@ int main()
 
 	glewInit();
 
+	printf("Maximum of vertex attributes supported: %d", getMaxVertexAttributesNumber());
+
 	float vertices[] = {  
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-	    -0.5f, -0.5f, 0.0f,
-	    -0.5f,  0.5f, 0.0f,
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+	    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+	    -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 	};
 
 	GLuint indices[] = {
@@ -185,8 +189,10 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(sizeof(float)*3));
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	char *vertexSrc = ReadStringFromFile("src/shaders/vertex.glsl");
 	char *fragmentSrc = ReadStringFromFile("src/shaders/fragment.glsl");

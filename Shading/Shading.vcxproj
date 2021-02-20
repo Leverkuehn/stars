@@ -136,6 +136,7 @@
     <ClCompile Include="src\math\geometry.cpp" />
     <ClCompile Include="src\math\matrices.cpp" />
     <ClCompile Include="src\math\utils.cpp" />
+    <ClCompile Include="src\utils\info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\background.glsl" />
@@ -158,6 +159,7 @@
     <ClInclude Include="src\math\geometry.h" />
     <ClInclude Include="src\math\matrices.h" />
     <ClInclude Include="src\math\utils.h" />
+    <ClInclude Include="src\utils\info.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
