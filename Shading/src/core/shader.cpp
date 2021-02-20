@@ -1,0 +1,66 @@
+#include "shader.h"
+
+#define internal static
+
+#include <stdio.h>
+
+#include "../utils/io.h"
+
+internal uint32 internal_createShaderFromVertexAndFragmentSource(char *vertexSrc, char *fragmentSrc)
+{
+	uint32 programID = 0, vertexID = 0, fragmentID = 0;
+
+	vertexID = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexID, 1, &vertexSrc, NULL);
+	glCompileShader(vertexID);
+	GLint success;
+	GLchar infoLog[512];
+	glGetShaderiv(vertexID, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(vertexID, 512, NULL, infoLog);
+		printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
+	}
+
+	fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentID, 1, &fragmentSrc, NULL);
+	glCompileShader(fragmentID);
+	glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentID, 512, NULL, infoLog);
+		printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
+	}
+
+	programID = glCreateProgram();
+	glAttachShader(programID, vertexID);
+	glAttachShader(programID, fragmentID);
+	glLinkProgram(programID);
+	glGetProgramiv(programID, GL_LINK_STATUS, &success);
+	if (!success) {
+		glGetProgramInfoLog(programID, 512, NULL, infoLog);
+		printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
+	}
+
+	glDeleteShader(vertexID);
+	glDeleteShader(fragmentID);
+
+	return(programID);
+}
+
+coreShader coreCreateShaderFromVertexAndFragmentSource(const char *vertexSourceFilepath, const char *fragmentSourceFilepath)
+{
+	coreShader shader;
+
+	char *vertexSource = ReadStringFromFile(vertexSourceFilepath);
+	char *fragmentSource = ReadStringFromFile(fragmentSourceFilepath);
+	shader.id = internal_createShaderFromVertexAndFragmentSource(vertexSource, fragmentSource);
+
+	return shader;
+}
+
+void coreBindShader(coreShader *shader)
+{
+	glUseProgram(shader->id);
+}
+

@@ -1,4 +1,3 @@
-
 #include<Windows.h>
 #include<GL\glew.h>
 #include<glfw3.h>
@@ -14,75 +13,13 @@
 #include "math\matrices.h"
 
 #include "utils\info.h"
+#include "utils\io.h"
+
+#include "core\shader.h"
 
 typedef unsigned int uint32;
 
 static float EPSILON = FLT_EPSILON * 15000;
-
-char* ReadStringFromFile(const char *filename)
-{
-	char *buffer = 0;
-	FILE *file = fopen(filename, "r");
-	long length;
-	if (file)
-	{
-		fseek(file, 0, SEEK_END);
-		length = ftell(file);
-		fseek(file, 0, SEEK_SET);
-
-		buffer = (char*)malloc(length);
-		memset(buffer, 0, length);
-
-		if (buffer)
-			fread(buffer, 1, length, file);
-
-		fclose(file);
-	}
-
-	return(buffer);
-}
-
-uint32 CreateProgram(char *vertexSrc, char *fragmentSrc)
-{
-	uint32 programID = 0, vertexID = 0, fragmentID = 0;
-
-	vertexID = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexID, 1, &vertexSrc, NULL);
-	glCompileShader(vertexID);
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertexID, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentID, 1, &fragmentSrc, NULL);
-	glCompileShader(fragmentID);
-	glGetShaderiv(fragmentID, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	programID = glCreateProgram();
-	glAttachShader(programID, vertexID);
-	glAttachShader(programID, fragmentID);
-	glLinkProgram(programID);
-	glGetProgramiv(programID, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(programID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-
-	glDeleteShader(vertexID);
-	glDeleteShader(fragmentID);
-
-	return(programID);
-}
 
 uint32 createComputeShader(const char *filename)
 {
@@ -194,10 +131,8 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	char *vertexSrc = ReadStringFromFile("src/shaders/vertex.glsl");
-	char *fragmentSrc = ReadStringFromFile("src/shaders/fragment.glsl");
-	uint32 program = CreateProgram(vertexSrc, fragmentSrc);
-	glUseProgram(program);
+	coreShader shader = coreCreateShaderFromVertexAndFragmentSource("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
+	coreBindShader(&shader);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -206,7 +141,7 @@ int main()
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glUseProgram(program);
+			coreBindShader(&shader);
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}

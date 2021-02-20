@@ -132,11 +132,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\geometry.cpp" />
     <ClCompile Include="src\math\matrices.cpp" />
     <ClCompile Include="src\math\utils.cpp" />
     <ClCompile Include="src\utils\info.cpp" />
+    <ClCompile Include="src\utils\io.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\background.glsl" />
@@ -156,10 +158,13 @@
     <None Include="src\shaders\vertex_seascape.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\shader.h" />
     <ClInclude Include="src\math\geometry.h" />
     <ClInclude Include="src\math\matrices.h" />
     <ClInclude Include="src\math\utils.h" />
     <ClInclude Include="src\utils\info.h" />
+    <ClInclude Include="src\utils\io.h" />
+    <ClInclude Include="src\utils\types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
