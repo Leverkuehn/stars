@@ -48,7 +48,7 @@ internal uint32 internal_createShaderFromVertexAndFragmentSource(char *vertexSrc
 	return(programID);
 }
 
-coreShader coreCreateShaderFromVertexAndFragmentSource(const char *vertexSourceFilepath, const char *fragmentSourceFilepath)
+coreShader coreShaderCreateFromVertexAndFragmentSource(const char *vertexSourceFilepath, const char *fragmentSourceFilepath)
 {
 	coreShader shader;
 
@@ -59,8 +59,27 @@ coreShader coreCreateShaderFromVertexAndFragmentSource(const char *vertexSourceF
 	return shader;
 }
 
-void coreBindShader(coreShader *shader)
+void coreShaderBind(coreShader *shader)
 {
 	glUseProgram(shader->id);
 }
 
+void coreShaderSetUniform1f(coreShader *shader, const char *uniformName, float value)
+{
+	coreShaderBind(shader);
+	glUniform1f(glGetUniformLocation(shader->id, uniformName), value);
+}
+
+void coreShaderSetUniform3f(coreShader *shader, const char *uniformName, vec3f value)
+{
+	coreShaderBind(shader);
+	glUniform3f(glGetUniformLocation(shader->id, uniformName), value.x, value.y, value.z);
+	//glUniform1fv(glGetUniformLocation(shader->id, uniformName), 3, (float*)(&value));
+}
+
+void coreShaderSetUniform4f(coreShader *shader, const char *uniformName, vec4f value)
+{
+	coreShaderBind(shader);
+	glUniform4f(glGetUniformLocation(shader->id, uniformName), value.x, value.y, value.z, value.w);
+	//glUniform1fv(glGetUniformLocation(shader->id, uniformName), 4, (float*)(&value));
+}

@@ -131,8 +131,8 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	coreShader shader = coreCreateShaderFromVertexAndFragmentSource("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
-	coreBindShader(&shader);
+	coreShader shader = coreShaderCreateFromVertexAndFragmentSource("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
+	coreShaderBind(&shader);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -141,7 +141,11 @@ int main()
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			coreBindShader(&shader);
+			coreShaderBind(&shader);
+			
+			vec3f color = { 1.0f, 0.0f, 0.0f };
+			coreShaderSetUniform3f(&shader, "u_Color", color);
+
 			glBindVertexArray(VAO);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}

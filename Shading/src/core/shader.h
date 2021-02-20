@@ -4,12 +4,17 @@
 
 #include <GL\glew.h>
 
+#include "../utils/types.h"
+
 typedef struct coreShader
 {
 	uint32 id;
 } coreShader;
 
-coreShader coreCreateShaderFromVertexAndFragmentSource(const char *vertexSourceFilepath, const char *fragmentSourceFilepath);
+coreShader coreShaderCreateFromVertexAndFragmentSource(const char *vertexSourceFilepath, const char *fragmentSourceFilepath);
 
-void coreBindShader(coreShader *shader);
+void coreShaderBind(coreShader *shader);
 
+void coreShaderSetUniform1f(coreShader *shader, const char *uniformName, float value);
+void coreShaderSetUniform3f(coreShader *shader, const char *uniformName, vec3f value);
+void coreShaderSetUniform4f(coreShader *shader, const char *uniformName, vec4f value);
