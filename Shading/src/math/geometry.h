@@ -1,8 +1,6 @@
 ﻿#ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <math.h>
-
 #include "utils.h"
 
 float vec3fLength(vec3f a);
@@ -21,5 +19,7 @@ vec4f vec4fCross(vec4f a, vec4f b);
 float vec4fLength(vec4f v);
 
 color clamp(vec3f col);
+
+float toRadians(float degrees);
 
 #endif

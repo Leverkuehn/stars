@@ -33,6 +33,8 @@ vec3f createVec3f(float x, float y, float z);
 
 color vec3fToColor(vec3f vec);
 
+void vec3fNormalize(vec3f *v);
+
 int equal();
 
 vec4f vec4fPoint(float x, float y, float z);

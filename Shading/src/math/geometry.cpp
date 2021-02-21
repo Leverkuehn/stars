@@ -1,5 +1,9 @@
 #include "geometry.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+
 float vec3fLength(vec3f a)
 {
 	return(sqrt(vec3fDot(a, a)));
@@ -61,4 +65,9 @@ color clamp(vec3f col)
 	color result;
 	result = { (uint8)fminf(255, fmaxf(0, (float)col.x)), (uint8)fminf(255, fmaxf(0, (float)col.y)), (uint8)fminf(255, fmaxf(0, (float)col.z)) };
 	return result;
+}
+
+float toRadians(float degrees)
+{
+	return degrees * M_PI / 180.0f;
 }

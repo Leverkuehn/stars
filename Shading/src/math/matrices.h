@@ -65,7 +65,11 @@ mat4 mat4RotationY(float radians);
 
 mat4 mat4RotationZ(float radians);
 
+mat4 mat4Rotation(float radians, vec3f axis);
+
 mat4 mat4Shearing(float xy, float xz, float yx, float yz, float zx, float zy);
+
+mat4 mat4Projection(float FoV, float aspect, float near, float far);
 
 void mat4Print(mat4 *a);
 

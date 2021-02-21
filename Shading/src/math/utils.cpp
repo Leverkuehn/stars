@@ -104,6 +104,12 @@ color vec3fToColor(vec3f vec)
 	return result;
 }
 
+void vec3fNormalize(vec3f *v)
+{
+	float length = sqrtf(vec3fDot(*v, *v));
+	*v = { v->x / length, v->y / length , v->z / length};
+}
+
 int equal()
 {
 	return 0;

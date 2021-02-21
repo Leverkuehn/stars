@@ -258,6 +258,62 @@ mat4 mat4RotationZ(float radians)
 	return result;
 }
 
+mat4 mat4Rotation(float radians, vec3f axis)
+{
+	/*template<typename T, qualifier Q>
+	GLM_FUNC_QUALIFIER mat<4, 4, T, Q> rotate(mat<4, 4, T, Q> const& m, T angle, vec<3, T, Q> const& v)
+	{
+		T const a = angle;
+		T const c = cos(a);
+		T const s = sin(a);
+
+		vec<3, T, Q> axis(normalize(v));
+		vec<3, T, Q> temp((T(1) - c) * axis);
+
+		mat<4, 4, T, Q> Rotate;
+		Rotate[0][0] = c + temp[0] * axis[0];
+		Rotate[0][1] = temp[0] * axis[1] + s * axis[2];
+		Rotate[0][2] = temp[0] * axis[2] - s * axis[1];
+
+		Rotate[1][0] = temp[1] * axis[0] - s * axis[2];
+		Rotate[1][1] = c + temp[1] * axis[1];
+		Rotate[1][2] = temp[1] * axis[2] + s * axis[0];
+
+		Rotate[2][0] = temp[2] * axis[0] + s * axis[1];
+		Rotate[2][1] = temp[2] * axis[1] - s * axis[0];
+		Rotate[2][2] = c + temp[2] * axis[2];
+
+		mat<4, 4, T, Q> Result;
+		Result[0] = m[0] * Rotate[0][0] + m[1] * Rotate[0][1] + m[2] * Rotate[0][2];
+		Result[1] = m[0] * Rotate[1][0] + m[1] * Rotate[1][1] + m[2] * Rotate[1][2];
+		Result[2] = m[0] * Rotate[2][0] + m[1] * Rotate[2][1] + m[2] * Rotate[2][2];
+		Result[3] = m[3];
+		return Result;
+	}*/
+
+	const float c = cosf(radians);
+	const float s = sinf(radians);
+
+	vec3fNormalize(&axis);
+	vec3f temp = vec3fMulByVal(axis, 1.0f - c);
+
+	mat4 rotate = mat4Identity();
+
+	rotate.data[0] = c + temp.x * axis.x;
+	rotate.data[1] = temp.x * axis.y + s * axis.z;
+	rotate.data[2] = temp.x * axis.z - s * axis.y;
+
+	rotate.data[4] = temp.y * axis.x - s * axis.z;
+	rotate.data[5] = c + temp.y * axis.y;
+	rotate.data[6] = temp.y * axis.z + s * axis.x;
+
+	rotate.data[8] = temp.z * axis.x + s * axis.y;
+	rotate.data[9] = temp.z * axis.y - s * axis.x;
+	rotate.data[10] = c + temp.z * axis.z;
+
+	return rotate;
+}
+
 mat4 mat4Shearing(float xy, float xz, float yx, float yz, float zx, float zy)
 {
 	mat4 result = mat4Identity();
@@ -268,6 +324,21 @@ mat4 mat4Shearing(float xy, float xz, float yx, float yz, float zx, float zy)
 	result.data[6] = yz;
 	result.data[8] = zx;
 	result.data[9] = zy;
+
+	return result;
+}
+
+mat4 mat4Projection(float FoV, float aspect, float near, float far)
+{
+	mat4 result = {};
+
+	float halfTan = tanf(FoV / 2.0f);
+
+	result.data[0]  = 1.0f / (aspect * halfTan);
+	result.data[5]  = 1.0f / halfTan;
+	result.data[10] = -(far + near) / (far - near);
+	result.data[11] = -(2 * far * near) / (far - near);
+	result.data[14] = -1;
 
 	return result;
 }

@@ -1,4 +1,3 @@
-#include<Windows.h>
 #include<GL\glew.h>
 #include<glfw3.h>
 #include<iostream>
@@ -19,6 +18,11 @@
 
 #include "utils\vendor\stb_image.h"
 
+#include "glm\glm.hpp"
+#include "glm\gtc\matrix_transform.hpp"
+#include "glm\gtc\type_ptr.hpp"
+#include <glm/gtx/string_cast.hpp>
+
 int main()
 {
 	if (!glfwInit())
@@ -27,7 +31,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	int screenW = 640, screenH = 480;
+	int screenW = 1280, screenH = 720;
 
 	GLFWwindow *window = glfwCreateWindow(screenW, screenH, "OpenGL", NULL, NULL);
 	if (!window)
@@ -118,25 +122,100 @@ int main()
 	glUniform1i(glGetUniformLocation(shader.id, "tex1"), 0);
 	glUniform1i(glGetUniformLocation(shader.id, "tex2"), 1);
 
-	/*mat4 rotation = mat4RotationZ(M_PI / 2);
-	mat4 scaling = mat4Scaling({ 0.5f, 0.5f, 0.5f, 1.0f });
-	mat4 transform = mat4Mul(&scaling, &rotation);
-	coreShaderSetUniformMatrix4f(&shader, "transform", &transform);*/
+//------------------ Initializing cube----------------------
+
+	float cubeVertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,  
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	};
+
+	uint32 cubeVBO, cubeVAO;
+	glGenVertexArrays(1, &cubeVAO);
+	glGenBuffers(1, &cubeVBO);
+	glBindVertexArray(cubeVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(sizeof(float) * 3));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+//------------------ End -----------------------------------
+
+	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
-			mat4 translation = mat4Translation({ 0.5, -0.5, 0.0f, 0.0f });
-			mat4 rotation = mat4RotationZ(glfwGetTime());
-			mat4 transformation = mat4Mul(&translation, &rotation);
-			coreShaderSetUniformMatrix4f(&shader, "transform", &transformation);
+			glm::mat4 model = glm::mat4(1.0f);
+			float time = (float)glfwGetTime();
+			model = glm::rotate(model, time, glm::vec3(0.5f, 1.0f, 0.0f));
+			coreShaderBind(&shader);
+			
+			//glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			mat4 modelTest = mat4Rotation(time, { 0.5f, 1.0f, 0.0f });
+
+			coreShaderSetUniformMatrix4f(&shader, "model", &modelTest);
+
+			//std::cout << glm::to_string(model) << std::endl;
+			//mat4Print(&modelTest);
+
+			//mat4 model = mat4Rotation((float)glfwGetTime(), { 0.5f, 1.0f, 0.0f });
+			mat4 view = mat4Translation({ 0.0f, 0.0f, -3.0f, 0.0f });
+			mat4 projection = mat4Projection(toRadians(45.0f), (float)screenW / (float)screenH, 0.1f, 100.0f);
+
+			//coreShaderSetUniformMatrix4f(&shader, "model", &model);
+			coreShaderSetUniformMatrix4f(&shader, "view", &view);
+			coreShaderSetUniformMatrix4f(&shader, "projection", &projection);
 		}
 
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			coreShaderBind(&shader);
 			
 			glActiveTexture(GL_TEXTURE0);
@@ -144,8 +223,11 @@ int main()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texture2);
 
-			glBindVertexArray(VAO);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			/*glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
+
+			glBindVertexArray(cubeVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
 		glfwPollEvents();
