@@ -205,7 +205,6 @@ mat4 mat4Translation(vec4f v)
 	result.data[3] = v.x;
 	result.data[7] = v.y;
 	result.data[11] = v.z;
-	result.data[15] = 1;
 
 	return  result;
 }
@@ -295,11 +294,11 @@ mat4 mat4Rotation(float radians, vec3f axis)
 	const float s = sinf(radians);
 
 	vec3fNormalize(&axis);
-	vec3f temp = vec3fMulByVal(axis, 1.0f - c);
+	//vec3f temp = vec3fMulByVal(axis, 1.0f - c);
 
 	mat4 rotate = mat4Identity();
 
-	rotate.data[0] = c + temp.x * axis.x;
+	/*rotate.data[0] = c + temp.x * axis.x;
 	rotate.data[1] = temp.x * axis.y + s * axis.z;
 	rotate.data[2] = temp.x * axis.z - s * axis.y;
 
@@ -309,7 +308,21 @@ mat4 mat4Rotation(float radians, vec3f axis)
 
 	rotate.data[8] = temp.z * axis.x + s * axis.y;
 	rotate.data[9] = temp.z * axis.y - s * axis.x;
-	rotate.data[10] = c + temp.z * axis.z;
+	rotate.data[10] = c + temp.z * axis.z;*/
+
+	const float cc = 1.0f - c;
+
+	rotate.data[0] = c + axis.x * axis.x * cc;
+	rotate.data[1] = axis.x * axis.y * cc - axis.z * s;
+	rotate.data[2] = axis.x * axis.z * cc + axis.y * s;
+
+	rotate.data[4] = axis.y * axis.x * cc + axis.z * s;
+	rotate.data[5] = c + axis.y * axis.y * cc;
+	rotate.data[6] = axis.y * axis.z * cc - axis.x * s;
+
+	rotate.data[8] = axis.z * axis.x * cc - axis.y * s;
+	rotate.data[9] = axis.z * axis.y * cc + axis.x * s;
+	rotate.data[10] = c + axis.z * axis.z * cc;
 
 	return rotate;
 }
