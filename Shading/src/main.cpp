@@ -46,19 +46,6 @@ int main()
 
 	printf("Maximum of vertex attributes supported: %d\n", getMaxVertexAttributesNumber());
 
-	float vertices[] = {  
-		// positions		  // colors			  // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-	    -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-	};
-
-	GLuint indices[] = {
-		0, 1, 3,
-		1, 2, 3
-	};
-
 //------------------ Initializing texture----------------------
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
@@ -95,26 +82,6 @@ int main()
 	stbi_image_free(data);
 
 //------------------ End --------------------------------------
-
-	unsigned int VBO, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(sizeof(float) * 6));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
 
 	coreShader shader = coreShaderCreateFromVertexAndFragmentSource("src/shaders/vertex.glsl", "src/shaders/fragment.glsl");
 	coreShaderBind(&shader);
@@ -185,6 +152,19 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
+	vec4f cubePositions[] = {
+		{0.0f,  0.0f,  0.0f , 0.0f },
+		{2.0f,  5.0f, -15.0f, 0.0f },
+		{-1.5f, -2.2f, -2.5f, 0.0f },
+		{-3.8f, -2.0f, -12.3, 0.0f },
+		{2.4f, -0.4f, -3.5f , 0.0f },
+		{-1.7f,  3.0f, -7.5f, 0.0f },
+		{1.3f, -2.0f, -2.5f , 0.0f },
+		{1.5f,  2.0f, -2.5f , 0.0f },
+		{1.5f,  0.2f, -1.5f , 0.0f },
+		{-1.3f,  1.0f, -1.5f, 0.0f },
+	};
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -215,7 +195,6 @@ int main()
 
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			coreShaderBind(&shader);
 			
 			glActiveTexture(GL_TEXTURE0);
@@ -223,11 +202,15 @@ int main()
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texture2);
 
-			/*glBindVertexArray(VAO);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
-
 			glBindVertexArray(cubeVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			for (uint32 i = 0; i < 10; i++)
+			{
+				mat4 translation = mat4Translation(cubePositions[i]);
+				float angle = 20.0f * i + 5;
+				mat4 model = mat4Mul(&translation, &mat4Rotation(toRadians(angle) * (float)glfwGetTime(), { 1.0f, 0.3f, 0.5f }));
+				coreShaderSetUniformMatrix4f(&shader, "model", &model);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
 		}
 
 		glfwPollEvents();
@@ -236,8 +219,8 @@ int main()
 		}
 		glfwSwapBuffers(window);
 	}
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	glDeleteVertexArrays(1, &cubeVAO);
+	glDeleteBuffers(1, &cubeVBO);
 
 	glfwTerminate();
 	return(0);
