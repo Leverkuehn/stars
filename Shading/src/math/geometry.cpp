@@ -9,6 +9,12 @@ float vec3fLength(vec3f a)
 	return(sqrt(vec3fDot(a, a)));
 }
 
+vec3f vec3fNormalizeCopy(vec3f v)
+{
+	float length = sqrtf(vec3fDot(v, v));
+	return { v.x / length, v.y / length , v.z / length };
+}
+
 vec3f vec3fSub(vec3f a, vec3f b)
 {
 	vec3f result;
@@ -48,6 +54,16 @@ vec3f vec3fMulByVal(vec3f a, float value)
 	vec3f result;
 	result = { a.x*value, a.y*value, a.z*value };
 	return result;
+}
+
+vec3f vec3fNegate(vec3f v)
+{
+	return { -v.x, -v.y, -v.z };
+}
+
+vec3f vec3fCross(vec3f a, vec3f b)
+{
+	return { a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x };
 }
 
 vec4f vec4fCross(vec4f a, vec4f b)

@@ -26,55 +26,39 @@ float mat2Determinant(mat2 *a);
 mat2 mat3Submatrix(mat3 *a, uint8 row, uint8 col);
 
 float mat3Minor(mat3 *a, uint8 row, uint8 col);
-
 float mat3Cofactor(mat3 *a, uint8 row, uint8 col);
-
 float mat3Determinant(mat3 *a);
 
 int mat3SetElement(mat3 *a, int i, int j, float value);
-
 int mat4SetElement(mat4 *a, int i, int j, float value);
 
 mat4 mat4Identity();
-
 mat4 mat4Zero();
 
 mat4 mat4Transpose(mat4 *a);
 
 mat4 mat4Mul(mat4 *a, mat4 *b);
-
-vec4f  mat4MulByVec4f(mat4 *a, vec4f *b);
+vec4f mat4MulByVec4f(mat4 *a, vec4f *b);
 
 mat3 mat4Submatrix(mat4 *a, uint8 row, uint8 col);
 
 float mat4Minor(mat4 *a, uint8 row, uint8 col);
-
 float mat4Cofactor(mat4 *a, uint8 row, uint8 col);
-
 float mat4Determinant(mat4 *a);
 
 mat4 mat4Inverse(mat4 *a);
-
 mat4 mat4Translation(vec4f v);
-
 mat4 mat4Scaling(vec4f v);
-
 mat4 mat4RotationX(float radians);
-
 mat4 mat4RotationY(float radians);
-
 mat4 mat4RotationZ(float radians);
-
 mat4 mat4Rotation(float radians, vec3f axis);
-
 mat4 mat4Shearing(float xy, float xz, float yx, float yz, float zx, float zy);
-
 mat4 mat4Projection(float FoV, float aspect, float near, float far);
+mat4 mat4LookAt(vec3f position, vec3f target, vec3f up);
 
 void mat4Print(mat4 *a);
-
 void mat3Print(mat3 *a);
-
 void mat2Print(mat2 *a);
 
 #endif 

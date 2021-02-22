@@ -356,6 +356,33 @@ mat4 mat4Projection(float FoV, float aspect, float near, float far)
 	return result;
 }
 
+mat4 mat4LookAt(vec3f position, vec3f target, vec3f up)
+{
+	vec3f direction = vec3fNormalizeCopy(vec3fSub(position, target));
+	vec3f right = vec3fNormalizeCopy(vec3fCross(up, direction));
+	
+	vec3f cameraUp = vec3fCross(direction, right);
+
+	mat4 lookAt = mat4Identity();
+
+	lookAt.data[0]  = right.x;
+	lookAt.data[1]  = right.y;
+	lookAt.data[2]  = right.z;
+	lookAt.data[3]  = vec3fDot(vec3fNegate(position), right);
+
+	lookAt.data[4]  = cameraUp.x;
+	lookAt.data[5]  = cameraUp.y;
+	lookAt.data[6]  = cameraUp.z;
+	lookAt.data[7]  = vec3fDot(vec3fNegate(position), cameraUp);
+
+	lookAt.data[8]  = direction.x;
+	lookAt.data[9]  = direction.y;
+	lookAt.data[10] = direction.z;
+	lookAt.data[11] = vec3fDot(vec3fNegate(position), direction);
+
+	return lookAt;
+}
+
 void mat4Print(mat4 *a)
 {
 	for (uint8 i = 0; i < 4; i++)

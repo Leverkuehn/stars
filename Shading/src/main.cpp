@@ -23,6 +23,9 @@
 #include "glm\gtc\type_ptr.hpp"
 #include <glm/gtx/string_cast.hpp>
 
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
+
 int main()
 {
 	if (!glfwInit())
@@ -41,6 +44,7 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
 	glewInit();
 
@@ -170,8 +174,14 @@ int main()
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		processInput(window);
+
 		{
-			mat4 view = mat4Translation({ 0.0f, 0.0f, -3.0f, 0.0f });
+			const float radius = 10.0f;
+			float camX = sin(glfwGetTime()) * radius;
+			float camZ = cos(glfwGetTime()) * radius;
+			mat4 view = mat4LookAt({ camX, 0.0f, camZ }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+
 			mat4 projection = mat4Projection(toRadians(45.0f), (float)screenW / (float)screenH, 0.1f, 100.0f);
 
 			coreShaderSetUniformMatrix4f(&shader, "view", &view);
@@ -200,9 +210,6 @@ int main()
 		}
 
 		glfwPollEvents();
-		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-			glfwSetWindowShouldClose(window, 1);
-		}
 		glfwSwapBuffers(window);
 	}
 	glDeleteVertexArrays(1, &cubeVAO);
@@ -210,4 +217,15 @@ int main()
 
 	glfwTerminate();
 	return(0);
+}
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);
 }
