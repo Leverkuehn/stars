@@ -152,7 +152,7 @@ int main()
 
 	glEnable(GL_DEPTH_TEST);
 
-	vec4f cubePositions1[] = {
+	vec4f cubePositions[] = {
 		{0.0f,  0.0f,  0.0f , 0.0f },
 		{2.0f,  5.0f, -15.0f, 0.0f },
 		{-1.5f, -2.2f, -2.5f, 0.0f },
@@ -165,30 +165,15 @@ int main()
 		{-1.3f,  1.0f, -1.5f, 0.0f },
 	};
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
 	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		{
-			//mat4 model = mat4Rotation((float)glfwGetTime(), { 0.5f, 1.0f, 0.0f });
 			mat4 view = mat4Translation({ 0.0f, 0.0f, -3.0f, 0.0f });
 			mat4 projection = mat4Projection(toRadians(45.0f), (float)screenW / (float)screenH, 0.1f, 100.0f);
 
-			//coreShaderSetUniformMatrix4f(&shader, "model", &model);
 			coreShaderSetUniformMatrix4f(&shader, "view", &view);
 			coreShaderSetUniformMatrix4f(&shader, "projection", &projection);
 		}
@@ -205,28 +190,12 @@ int main()
 			glBindVertexArray(cubeVAO);
 			for (uint32 i = 0; i < 10; i++)
 			{
-				// My mat
-				mat4 translation = mat4Translation(cubePositions1[i]);
-				float angle = 20.0f;// *i + 5;
-				mat4 modelT = mat4Mul(&translation, &mat4Rotation((float)glfwGetTime(), { 1.0f, 0.3f, 0.5f }));
-				//coreShaderSetUniformMatrix4f(&shader, "model", &model);
-				//glDrawArrays(GL_TRIANGLES, 0, 36);
-				//-----------------------------
-
-				// GLM
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, cubePositions[i]);
-				//float angle = 20.0f;// *i;
-				model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-
-				//std::cout << glm::to_string(model) << std::endl;
-				//mat4Print(&modelT);
-				//system("cls");
-
-				glUniformMatrix4fv(glGetUniformLocation(shader.id, "model"), 1, GL_FALSE, glm::value_ptr(model));
-				//coreShaderSetUniformMatrix4f(&shader, "model", &modelT);
+				mat4 translation = mat4Translation(cubePositions[i]);
+				float angle = 20.0f  * i + 5;
+				mat4 model = mat4Mul(&translation, &mat4Rotation(angle * (float)glfwGetTime() / 20.0f, { 1.0f, 0.3f, 0.5f }));
+		
+				coreShaderSetUniformMatrix4f(&shader, "model", &model);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
-				//-----------------------------
 			}
 		}
 
