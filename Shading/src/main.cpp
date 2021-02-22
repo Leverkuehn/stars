@@ -23,8 +23,31 @@
 #include "glm\gtc\type_ptr.hpp"
 #include <glm/gtx/string_cast.hpp>
 
+#include "core/camera.h"
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+
+//------------------ Setting up camera ----------------------
+
+vec3f cameraPos = { 0.0f,  0.0f,  3.0f };
+vec3f cameraFront = { 0.0f,  0.0f, -1.0f };
+vec3f cameraUp = { 0.0f,  1.0f,  0.0f };
+
+//-----------------------------------------------------------
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+int screenW = 1280, screenH = 720;
+
+float lastX = screenW/2.0f, lastY = screenH/2.0f;
+
+bool firstMouse = true;
+
+camera cam = coreCameraCreate({ 0.0f, 0.0f, 3.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, -1.0f });
 
 int main()
 {
@@ -34,8 +57,6 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	int screenW = 1280, screenH = 720;
-
 	GLFWwindow *window = glfwCreateWindow(screenW, screenH, "OpenGL", NULL, NULL);
 	if (!window)
 	{
@@ -44,7 +65,10 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetScrollCallback(window, scrollCallback);
 
 	glewInit();
 
@@ -171,6 +195,10 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		glClearColor(0.f, 0.f, 0.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -180,9 +208,9 @@ int main()
 			const float radius = 10.0f;
 			float camX = sin(glfwGetTime()) * radius;
 			float camZ = cos(glfwGetTime()) * radius;
-			mat4 view = mat4LookAt({ camX, 0.0f, camZ }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+			mat4 view = coreCameraGetLookAtMatrix(&cam);
 
-			mat4 projection = mat4Projection(toRadians(45.0f), (float)screenW / (float)screenH, 0.1f, 100.0f);
+			mat4 projection = mat4Projection(toRadians(cam.zoom), (float)screenW / (float)screenH, 0.1f, 100.0f);
 
 			coreShaderSetUniformMatrix4f(&shader, "view", &view);
 			coreShaderSetUniformMatrix4f(&shader, "projection", &projection);
@@ -224,8 +252,41 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	float xoffset = xpos - lastX;
+	float yoffset = lastY - ypos;
+
+	lastX = xpos;
+	lastY = ypos;
+
+	coreCameraProcessMouseMovement(&cam, xoffset, yoffset);
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	coreCameraProcessMouseScroll(&cam, yoffset);
+}
+
 void processInput(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	float cameraSpeed = 2.5f * deltaTime;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		coreCameraProcessKeyboard(&cam, CameraMovement::FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		coreCameraProcessKeyboard(&cam, CameraMovement::BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		coreCameraProcessKeyboard(&cam, CameraMovement::LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		coreCameraProcessKeyboard(&cam, CameraMovement::RIGHT, deltaTime);
 }

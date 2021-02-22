@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\camera.cpp" />
     <ClCompile Include="src\core\shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\geometry.cpp" />
@@ -159,6 +160,7 @@
     <None Include="src\shaders\vertex_seascape.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\camera.h" />
     <ClInclude Include="src\core\shader.h" />
     <ClInclude Include="src\math\geometry.h" />
     <ClInclude Include="src\math\matrices.h" />
