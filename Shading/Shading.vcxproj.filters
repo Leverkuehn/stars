@@ -59,6 +59,8 @@
     <None Include="src\shaders\computeShaders\raytracer.glsl" />
     <None Include="src\shaders\computeShaders\fromShaderToy.glsl" />
     <None Include="src\shaders\vertex_seascape.glsl" />
+    <None Include="src\shaders\vertex_lightCube.glsl" />
+    <None Include="src\shaders\fragment_lightCube.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\utils.h">

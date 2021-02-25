@@ -150,6 +150,7 @@
     <None Include="src\shaders\computeShaders\rt.glsl" />
     <None Include="src\shaders\fractal.glsl" />
     <None Include="src\shaders\fragment.glsl" />
+    <None Include="src\shaders\fragment_lightCube.glsl" />
     <None Include="src\shaders\Julia.glsl" />
     <None Include="src\shaders\lol.glsl" />
     <None Include="src\shaders\Mandelbrot.glsl" />
@@ -157,6 +158,7 @@
     <None Include="src\shaders\seascape.glsl" />
     <None Include="src\shaders\starfield.glsl" />
     <None Include="src\shaders\vertex.glsl" />
+    <None Include="src\shaders\vertex_lightCube.glsl" />
     <None Include="src\shaders\vertex_seascape.glsl" />
   </ItemGroup>
   <ItemGroup>

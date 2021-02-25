@@ -48,6 +48,10 @@ void coreCameraProcessKeyboard(camera *c, CameraMovement direction, float deltaT
 		c->position = vec3fSub(c->position, vec3fMulByVal(c->right, velocity));
 	if (direction == RIGHT)
 		c->position = vec3fAdd(c->position, vec3fMulByVal(c->right, velocity));
+	if (direction == UP)
+		c->position = vec3fAdd(c->position, vec3fMulByVal(c->up, velocity));
+	if (direction == DOWN)
+		c->position = vec3fSub(c->position, vec3fMulByVal(c->up, velocity));
 }
 
 void coreCameraProcessMouseMovement(camera *c, float xoffset, float yoffset)
